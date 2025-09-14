@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+
+typedef struct {
+    char NIS[20];
+    char nama[50];
+    char mataPelajaran[30];
+    float nilai;
+} Siswa;
+
+Siswa dataSiswa[MAX];
+int jumlahSiswa = 0;
+
+
+void inputData() {
+    if (jumlahSiswa >= MAX) {
+        printf("Data Penuh\n");
+        return;
+    }
+    
+	printf("\n=== Input Data Siswa ===\n");
+    printf("NIS: ");
+    scanf("%s", dataSiswa[jumlahSiswa].NIS);
+
+    printf("Nama: ");
+    scanf(" %[^\n]", dataSiswa[jumlahSiswa].nama);
+
+    printf("Mata Pelajaran: ");
+    scanf(" %[^\n]", dataSiswa[jumlahSiswa].mataPelajaran);
+
+    printf("Nilai: ");
+    scanf("%f", &dataSiswa[jumlahSiswa].nilai);
+
+    jumlahSiswa++;
+    printf("Data berhasil ditambahkan!\n");
+}
+
+
+
+
+void tampilkanData() {
+    if (jumlahSiswa == 0) {
+        printf("Belum ada data siswa!\n");
+        return;
+    }
+
+    //NIS
+    Siswa urutNIS[MAX];
+    memcpy(urutNIS, dataSiswa, sizeof(dataSiswa));
+
+    for (int i = 0; i < jumlahSiswa - 1; i++) {
+        for (int j = i + 1; j < jumlahSiswa; j++) {
+            if (strcmp(urutNIS[i].NIS, urutNIS[j].NIS) > 0) {
+                Siswa temp = urutNIS[i];
+                urutNIS[i] = urutNIS[j];
+                urutNIS[j] = temp;
+            }
+        }
+    }
+
+    printf("\n=== Daftar Semua Siswa (urut NIS) ===\n");
+    printf("%-10s %-15s %-15s %-5s\n", "NIS", "Nama", "Mata Pelajaran", "Nilai");
+    for (int i = 0; i < jumlahSiswa; i++) {
+        printf("%-10s %-15s %-15s %-5.2f\n",urutNIS[i].NIS, urutNIS[i].nama, urutNIS[i].mataPelajaran, urutNIS[i].nilai);
+    }
+
+	//NAMA
+    Siswa urutNama[MAX];
+    memcpy(urutNama, dataSiswa, sizeof(dataSiswa));
+
+    for (int i = 0; i < jumlahSiswa - 1; i++) {
+        for (int j = i + 1; j < jumlahSiswa; j++) {
+            if (strcmp(urutNama[i].nama, urutNama[j].nama) > 0) {
+                Siswa temp = urutNama[i];
+                urutNama[i] = urutNama[j];
+                urutNama[j] = temp;
+            }
+        }
+    }
+
+    printf("\n=== Daftar Semua Siswa (urut Nama) ===\n");
+    printf("%-10s %-15s %-15s %-5s\n", "NIS", "Nama", "Mata Pelajaran", "Nilai");
+    for (int i = 0; i < jumlahSiswa; i++) {
+        printf("%-10s %-15s %-15s %-5.2f\n",urutNama[i].NIS, urutNama[i].nama, urutNama[i].mataPelajaran, urutNama[i].nilai);
+    }
+}
+
+
+
+void cariSiswa() {
+    char nisCari[20];
+    int flag = 0;
+
+    printf("\nMasukkan NIS yang dicari: ");
+    scanf("%s", nisCari);
+
+    for (int i = 0; i < jumlahSiswa; i++) {
+        if (strcmp(dataSiswa[i].NIS, nisCari) == 0) {
+            printf("Data ditemukan!\n");
+            printf("NIS: %s\nNama: %s\nMata Pelajaran: %s\nNilai: %.2f\n", dataSiswa[i].NIS, dataSiswa[i].nama, dataSiswa[i].mataPelajaran, dataSiswa[i].nilai);
+            flag = 1;
+            break;
+        }
+    }
+
+    if (!flag) {
+        printf("Data dengan NIS %s tidak ditemukan!\n", nisCari);
+    }
+}
+
+
+void simpanKeFile() {
+    FILE *fp = fopen("data_siswa.csv", "w");
+    if (fp == NULL) {
+        printf("Gagal membuka file!\n");
+        return;
+    }
+
+    fprintf(fp, "NIS,Nama,Mata Pelajaran,Nilai\n");
+    for (int i = 0; i < jumlahSiswa; i++) {
+        fprintf(fp, "%s,%s,%s,%.2f\n", dataSiswa[i].NIS, dataSiswa[i].nama, dataSiswa[i].mataPelajaran, dataSiswa[i].nilai);
+    }
+
+    fclose(fp);
+    printf("Data berhasil disimpan ke file data_siswa.csv\n");
+}
+
+
+int main() {
+    int pilihan;
+
+    do {
+        printf("\n=== Aplikasi Manajemen Data Siswa ===\n");
+        printf("1. Input Data Siswa\n");
+        printf("2. Tampilkan Semua Data Siswa\n");
+        printf("3. Cari Siswa berdasarkan NIS\n");
+        printf("4. Simpan Data ke File\n");
+        printf("5. Keluar\n");
+        printf("Pilihan: ");
+        scanf("%d", &pilihan);
+        getchar();
+
+        switch (pilihan) {
+            case 1:
+                inputData();
+                break;
+            case 2:
+                tampilkanData();
+                break;
+            case 3:
+                cariSiswa();
+                break;
+            case 4:
+                simpanKeFile();
+                break;
+            case 5:
+                printf("Terima kasih telah menggunakan aplikasi ini!\n");
+                break;
+            default:
+                printf("Pilihan tidak valid!\n");
+        }
+    } while (pilihan != 5);
+
+    return 0;
+}
